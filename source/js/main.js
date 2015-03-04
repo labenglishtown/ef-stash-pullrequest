@@ -1,9 +1,12 @@
 $(function(){
-	var toDoList = getTodoList();
 
-	for(var i in toDoList){
-		getIssueDetail(toDoList[i]);	
-	}
+	setTimeout(function(){
+		var toDoList = getTodoList();
+
+		for(var i in toDoList){
+			getIssueDetail(toDoList[i]);	
+		}
+	}, 1000);
 	
 });
 
