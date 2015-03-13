@@ -43,7 +43,7 @@ function getIssueDetail(item){
 			function(result){
 				
 				item.id = result.id;
-				item.issuetype = result.issuetype;
+				item.issuetype = result.fields.issuetype;
 				if(result.fields){
 					item.status = result.fields.status;
 				}
@@ -56,12 +56,7 @@ function checkStatus (item) {
 	
 	if(item.issuetype.name == "Story"){
 		var ignoreStatus = [1,3,4,10001,10003,10006,10008,10072,10074];
-		for(var i =0;i < ignoreStatus.length; i++){
-			var ignore = ignoreStatus[i];
-			if(item.status.id == ignore){
-				return;
-			}
-		}
+		ignoreStatus.filter(function(value){return value===item.status.id;}) > 0 && return;
 	}else if(item.issuetype.name == "Bug"){
 		if(item.status.id != 6){
 			return;
