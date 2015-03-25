@@ -56,7 +56,8 @@ function checkStatus (item) {
 	
 	if(item.issuetype.name == "Story"){
 		var ignoreStatus = [1,3,4,10001,10003,10006,10008,10072,10074];
-		ignoreStatus.filter(function(value){return value===item.status.id;}) > 0 && return;
+		if(ignoreStatus.filter(function(value){return value===item.status.id;}) > 0) 
+			return;
 	}else if(item.issuetype.name == "Bug"){
 		if(item.status.id != 6){
 			return;
