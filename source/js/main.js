@@ -27,6 +27,12 @@ function getTodoList (argument) {
 			break;
 		}
 
+		/*
+		// debug
+		if(key != "RIO2016-660"){
+			continue;
+		}*/
+
 		var item = {};
 		item.element = $(href);
 		item.key = key;
@@ -55,7 +61,7 @@ function getIssueDetail(item){
 function checkStatus (item) {
 	
 	if(item.issuetype.name == "Story"){
-		var ignoreStatus = [1,3,4,10001,10003,10006,10008,10072,10074];
+		var ignoreStatus = ["1","3","4","10001","10003","10006","10008","10072","10074"];
 		if(ignoreStatus.filter(function(value){return value===item.status.id;}) > 0) 
 			return;
 	}else if(item.issuetype.name == "Bug"){
