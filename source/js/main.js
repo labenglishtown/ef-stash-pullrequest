@@ -59,7 +59,7 @@ function checkStatus (item) {
 		if(ignoreStatus.filter(function(value){return value===item.status.id;}) > 0) 
 			return;
 	}else if(item.issuetype.name == "Bug"){
-		if(item.status.id != 6){
+		if(item.status.id != "6"){
 			return;
 		}
 	}else{
