@@ -43,6 +43,7 @@ function getIssueDetail(item){
 			function(result){
 				
 				item.id = result.id;
+				item.issuetype = result.fields.issuetype;
 				if(result.fields){
 					item.status = result.fields.status;
 				}
@@ -52,16 +53,19 @@ function getIssueDetail(item){
 }
 
 function checkStatus (item) {
-	var ignoreStatus = [1,3,4,10001,10003,10006,10008,10072,10074];
-
-	for(var i =0;i < ignoreStatus.length; i++){
-		var ignore = ignoreStatus[i];
-		if(item.status.id == ignore){
-
+	
+	if(item.issuetype.name == "Story"){
+		var ignoreStatus = [1,3,4,10001,10003,10006,10008,10072,10074];
+		if(ignoreStatus.filter(function(value){return value===item.status.id;}) > 0) 
+			return;
+	}else if(item.issuetype.name == "Bug"){
+		if(item.status.id != 6){
 			return;
 		}
+	}else{
+		return;
 	}
-
+	
 	getPullReuqestInfo(item);
 }
 
@@ -142,6 +146,8 @@ function setUI(item){
 		}
 
 		var name = branch.name;
+		
+		/*
 		if(name.indexOf('team\/') == 0){
 			var index = name.indexOf("\/", 5);
 			if(index != -1){
@@ -151,6 +157,9 @@ function setUI(item){
 		}else{
 			name = "";
 		}
+		*/
+
+		name = "refs/heads/" + branch.name;
 
 		var url = branch.repository.url;
 		url = url.substring(0, url.length - 7);
