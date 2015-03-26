@@ -18,13 +18,13 @@ function getTodoList (argument) {
 	}
 
 	var toDoList = [];
-	for(var hrefIndex in hrefElementArray){
+	for(var hrefIndex = 0; hrefIndex < hrefElementArray.length; hrefIndex++){
 		var href = hrefElementArray[hrefIndex];
 
 		var key = $(href).text();
 
 		if(!key){
-			break;
+			continue;
 		}
 
 		/*
@@ -36,6 +36,30 @@ function getTodoList (argument) {
 		var item = {};
 		item.element = $(href);
 		item.key = key;
+		item.type = 'block';
+		toDoList.push(item);
+	}
+
+	var hrefElementArray = $('.ghx-swimlane');
+	if(!hrefElementArray.length){
+		return;
+	}
+	var container = hrefElementArray.eq(hrefElementArray.length - 1);
+	container = container.find('.ghx-columns .ghx-column:last');
+	var items = container.find('.js-detailview');
+
+	for(var i = 0; i < items.length; i++){
+		var domItem = items[i];
+		var a = $(domItem).find('.ghx-key a');
+		var key = a.text();
+		if(!key){
+			continue;
+		}
+
+		var item = {};
+		item.element = $(domItem);
+		item.key = key;
+		item.type = 'item';
 		toDoList.push(item);
 	}
 
@@ -126,7 +150,6 @@ function setUI(item){
 		var branch = item.branches[i];
 		if(!branch.existsDevelopBranch){
 			branchNeedPull.push(branch);
-			//break;
 		}
 	}
 
@@ -134,47 +157,57 @@ function setUI(item){
 		return;
 	}
 
-	var parent = item.element.parent().parent();
-	var template = '<div class="ghx-bandaid" style="margin-top:5px;margin-right:14px;"><a class="aui-button">Pull request(' + branchNeedPull.length + ')</a></div>';
-	var buttonContainer = $(template);
-	parent.append(buttonContainer);
+	function clickme (event) {
+			event.preventDefault();
 
-	var button = buttonContainer.find('a');
-	button.click(function (event) {
-		event.preventDefault();
-
-		var branch = branchNeedPull.pop();
-		if(!branchNeedPull.length){
-			button.parent().hide();
-			button.unbind();
-		}else{
-			button.text('Pull request(' + branchNeedPull.length + ')');
-		}
-
-		var name = branch.name;
-		
-		/*
-		if(name.indexOf('team\/') == 0){
-			var index = name.indexOf("\/", 5);
-			if(index != -1){
-				name = name.substring(0, index + 1);
-				name = "refs/heads/" + name + "develop";
+			var branch = branchNeedPull.pop();
+			if(!branchNeedPull.length){
+				button.parent().hide();
+				button.unbind();
+			}else{
+				button.text('Pull request(' + branchNeedPull.length + ')');
 			}
-		}else{
-			name = "";
+
+			var name = branch.name;
+			
+			/*
+			if(name.indexOf('team\/') == 0){
+				var index = name.indexOf("\/", 5);
+				if(index != -1){
+					name = name.substring(0, index + 1);
+					name = "refs/heads/" + name + "develop";
+				}
+			}else{
+				name = "";
+			}
+			*/
+
+			name = "refs/heads/" + branch.name;
+
+			var url = branch.repository.url;
+			url = url.substring(0, url.length - 7);
+			url = url + '/pull-requests?create&targetBranch=refs%2Fheads%2Fdevelop&sourceBranch=' + encodeURIComponent(name);
+			
+			openNewTab(url);
+
+			return false;
 		}
-		*/
 
-		name = "refs/heads/" + branch.name;
+	if(item.type == "block"){
+		var parent = item.element.parent().parent();
+		var template = '<div class="ghx-bandaid" style="margin-top:5px;margin-right:14px;"><a class="aui-button">Pull request(' + branchNeedPull.length + ')</a></div>';
+		var buttonContainer = $(template);
+		parent.append(buttonContainer);
 
-		var url = branch.repository.url;
-		url = url.substring(0, url.length - 7);
-		url = url + '/pull-requests?create&targetBranch=refs%2Fheads%2Fdevelop&sourceBranch=' + encodeURIComponent(name);
-		
-		openNewTab(url);
+		var button = buttonContainer.find('a');
+		button.click(clickme);
+	}else{
+		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
+		item.element.append(button);
 
-		return false;
-	});
+		button = button.find('button')
+		button.click(clickme);
+	}
 }
 
 function openNewTab (url) {
