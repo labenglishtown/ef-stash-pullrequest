@@ -10,14 +10,38 @@ $(function(){
 	
 });
 
-
 function getTodoList (argument) {
-	var hrefElementArray = $('.ghx-swimlane .ghx-heading a[href^="/browse/"]');
-	if(!hrefElementArray.length){
-		return;
+	var toDoList1 = getTodoListBlock(argument);
+	var toDoList2 = getTodoListItem(argument);
+	var toDoList3 = getTodoListFilterItem(argument);
+
+	var todoList = [];
+	todoList = appendArray(toDoList1, todoList);
+	todoList = appendArray(toDoList2, todoList);
+	todoList = appendArray(toDoList3, todoList);
+
+	return todoList;
+}
+
+function appendArray(source, target){
+	if(source && target){
+		for(var i =0;i<source.length;i++){
+			var tmp = source[i];
+			target.push(tmp);
+		}
 	}
 
+	return target;
+}
+
+function getTodoListBlock (argument) {
 	var toDoList = [];
+
+	var hrefElementArray = $('.ghx-swimlane .ghx-heading a[href^="/browse/"]');
+	if(!hrefElementArray.length){
+		return toDoList;
+	}
+	
 	for(var hrefIndex = 0; hrefIndex < hrefElementArray.length; hrefIndex++){
 		var href = hrefElementArray[hrefIndex];
 
@@ -40,9 +64,15 @@ function getTodoList (argument) {
 		toDoList.push(item);
 	}
 
+	return toDoList;
+}
+
+function getTodoListItem (argument) {
+	var toDoList = [];
+
 	var hrefElementArray = $('.ghx-swimlane');
 	if(!hrefElementArray.length){
-		return;
+		return toDoList;
 	}
 	var container = hrefElementArray.eq(hrefElementArray.length - 1);
 	container = container.find('.ghx-columns .ghx-column:last');
@@ -60,6 +90,33 @@ function getTodoList (argument) {
 		item.element = $(domItem);
 		item.key = key;
 		item.type = 'item';
+		toDoList.push(item);
+	}
+
+	return toDoList;
+}
+
+
+function getTodoListFilterItem (argument) {
+	var toDoList = [];
+
+	var items = $('#issuetable tbody tr .issuekey');
+	if(!items.length){
+		return toDoList;
+	}
+
+	for(var i = 0; i < items.length; i++){
+		var domItem = items[i];
+		var a = $(domItem).find('a');
+		var key = a.text();
+		if(!key){
+			continue;
+		}
+
+		var item = {};
+		item.element = $(domItem);
+		item.key = key;
+		item.type = 'filter_item';
 		toDoList.push(item);
 	}
 
@@ -200,6 +257,12 @@ function setUI(item){
 		parent.append(buttonContainer);
 
 		var button = buttonContainer.find('a');
+		button.click(clickme);
+	}else if(item.type == "item"){
+		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
+		item.element.append(button);
+
+		button = button.find('button')
 		button.click(clickme);
 	}else{
 		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');

@@ -11,7 +11,8 @@
   },
    "content_scripts": [ {
       "js": [ "js/jquery-2.1.3.min.js", "js/main.js" ],
-      "matches": [ "https://jira.englishtown.com/secure/RapidBoard.jspa*" ],
+      "matches": [ "https://jira.englishtown.com/secure/RapidBoard.jspa*",
+                        "https://jira.englishtown.com/issues/?*" ],
       "run_at": "document_idle"
    } ],
    "description": "make pull request on Jira dashboard",
@@ -22,5 +23,5 @@
       "keyword": "Jira"
    },
    "permissions": [ "https://jira.englishtown.com/*"],
-   "version": "1.3.4"
+   "version": "1.4"
 }
