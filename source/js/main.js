@@ -6,7 +6,7 @@ $(function(){
 		for(var i in toDoList){
 			getIssueDetail(toDoList[i]);	
 		}
-	}, 1000);
+	}, 1500);
 	
 });
 
@@ -14,11 +14,13 @@ function getTodoList (argument) {
 	var toDoList1 = getTodoListBlock(argument);
 	var toDoList2 = getTodoListItem(argument);
 	var toDoList3 = getTodoListFilterItem(argument);
+	var toDoList4 = getTodoListFilterItemDetail(argument);
 
 	var todoList = [];
 	todoList = appendArray(toDoList1, todoList);
 	todoList = appendArray(toDoList2, todoList);
 	todoList = appendArray(toDoList3, todoList);
+	todoList = appendArray(toDoList4, todoList);
 
 	return todoList;
 }
@@ -123,6 +125,32 @@ function getTodoListFilterItem (argument) {
 	return toDoList;
 }
 
+function getTodoListFilterItemDetail (argument) {
+	var toDoList = [];
+
+	var items = $('.issue-list li');
+	if(!items.length){
+		return toDoList;
+	}
+
+	for(var i = 0; i < items.length; i++){
+		var domItem = items[i];
+		var a = $(domItem).find('a .issue-link-key');
+		var key = a.text();
+		if(!key){
+			continue;
+		}
+
+		var item = {};
+		item.element = $(domItem);
+		item.key = key;
+		item.type = 'filter_item_detail';
+		toDoList.push(item);
+	}
+
+	return toDoList;
+}
+
 function getIssueDetail(item){
 	var href = "https://jira.englishtown.com/rest/api/2/issue/" + item.key;
 	$.getJSON(href,
@@ -142,7 +170,8 @@ function getIssueDetail(item){
 function checkStatus (item) {
 	
 	if(item.issuetype.name == "Story"){
-		var ignoreStatus = ["1","3","4","10001","10003","10006","10008","10072","10074"];
+		var ignoreStatus = ["1","3","4", "5", "6", "10001","10003","10006",
+		"10008","10072", "10073", "10074"];
 		if(ignoreStatus.filter(function(value){return value===item.status.id;}) > 0) 
 			return;
 	}else if(item.issuetype.name == "Bug"){
@@ -264,7 +293,13 @@ function setUI(item){
 
 		button = button.find('button')
 		button.click(clickme);
-	}else{
+	}else if(item.type == "filter_item"){
+		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
+		item.element.append(button);
+
+		button = button.find('button')
+		button.click(clickme);
+	}else if(item.type == "filter_item_detail"){
 		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
 		item.element.append(button);
 
