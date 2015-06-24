@@ -11,14 +11,12 @@ $(function(){
 });
 
 function getTodoList (argument) {
-	var toDoList1 = getTodoListBlock(argument);
-	var toDoList2 = getTodoListItem(argument);
+	var toDoList1 = getTodoListBlockDone(argument);
 	var toDoList3 = getTodoListFilterItem(argument);
 	var toDoList4 = getTodoListFilterItemDetail(argument);
 
 	var todoList = [];
 	todoList = appendArray(toDoList1, todoList);
-	todoList = appendArray(toDoList2, todoList);
 	todoList = appendArray(toDoList3, todoList);
 	todoList = appendArray(toDoList4, todoList);
 
@@ -36,68 +34,66 @@ function appendArray(source, target){
 	return target;
 }
 
-function getTodoListBlock (argument) {
+function getTodoListBlockDone (argument) {
 	var toDoList = [];
 
-	var hrefElementArray = $('.ghx-swimlane .ghx-heading a[href^="/browse/"]');
-	if(!hrefElementArray.length){
+	var columns = $('.ghx-swimlane');
+	if(!columns.length){
 		return toDoList;
 	}
-	
-	for(var hrefIndex = 0; hrefIndex < hrefElementArray.length; hrefIndex++){
-		var href = hrefElementArray[hrefIndex];
 
-		var key = $(href).text();
+	for(var columnIndex=0;columnIndex<columns.length;columnIndex++){
+		var column = columns.eq(columnIndex);
+		// column style
+		var findColumn = column.find('.ghx-column');
+		if(findColumn.length){
+			findColumn = findColumn.eq(findColumn.length - 1);
+			var items = findColumn.find('a[href^="/browse/"]');
 
-		if(!key){
+			if(items.length){
+				var element = $(items.eq(0));
+				var key = element.text();
+
+				if(!key){
+					continue;
+				}
+
+				var item = {};
+				item.element = element;
+				item.key = key;
+				item.type = 'item';
+				toDoList.push(item);
+			}
+		}
+
+		// heading - block style
+		var headings = column.find('.ghx-heading');
+		if(!headings.length){
 			continue;
 		}
 
-		/*
-		// debug
-		if(key != "RIO2016-660"){
-			continue;
-		}*/
+		for(var headingIndex =0;headingIndex < headings.length;headingIndex++){
+			var heading = headings.eq(headingIndex);
+			var items = heading.find('a[href^="/browse/"]');
+			if(items.length){
+				var element = $(items.eq(0));
+				var key = element.text();
 
-		var item = {};
-		item.element = $(href);
-		item.key = key;
-		item.type = 'block';
-		toDoList.push(item);
+				if(!key){
+					continue;
+				}
+
+				var item = {};
+				item.element = element;
+				item.key = key;
+				item.type = 'block';
+				toDoList.push(item);
+			}
+		}
 	}
 
 	return toDoList;
 }
-
-function getTodoListItem (argument) {
-	var toDoList = [];
-
-	var hrefElementArray = $('.ghx-swimlane');
-	if(!hrefElementArray.length){
-		return toDoList;
-	}
-	var container = hrefElementArray.eq(hrefElementArray.length - 1);
-	container = container.find('.ghx-columns .ghx-column:last');
-	var items = container.find('.js-detailview');
-
-	for(var i = 0; i < items.length; i++){
-		var domItem = items[i];
-		var a = $(domItem).find('.ghx-key a');
-		var key = a.text();
-		if(!key){
-			continue;
-		}
-
-		var item = {};
-		item.element = $(domItem);
-		item.key = key;
-		item.type = 'item';
-		toDoList.push(item);
-	}
-
-	return toDoList;
-}
-
 
 function getTodoListFilterItem (argument) {
 	var toDoList = [];
