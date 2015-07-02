@@ -50,8 +50,8 @@ function getTodoListBlockDone (argument) {
 			findColumn = findColumn.eq(findColumn.length - 1);
 			var items = findColumn.find('a[href^="/browse/"]');
 
-			if(items.length){
-				var element = $(items.eq(0));
+			for(var itemIndex = 0;itemIndex<items.length;itemIndex++){
+				var element = $(items.eq(itemIndex));
 				var key = element.text();
 
 				if(!key){
@@ -62,7 +62,7 @@ function getTodoListBlockDone (argument) {
 				item.element = element;
 				item.key = key;
 				item.type = 'item';
-				toDoList.push(item);
+				toDoList.push(item);	
 			}
 		}
 
@@ -75,8 +75,8 @@ function getTodoListBlockDone (argument) {
 		for(var headingIndex =0;headingIndex < headings.length;headingIndex++){
 			var heading = headings.eq(headingIndex);
 			var items = heading.find('a[href^="/browse/"]');
-			if(items.length){
-				var element = $(items.eq(0));
+			for(var itemIndex = 0;itemIndex < items.length;itemIndex++){
+				var element = $(items.eq(itemIndex));
 				var key = element.text();
 
 				if(!key){
@@ -284,23 +284,24 @@ function setUI(item){
 		var button = buttonContainer.find('a');
 		button.click(clickme);
 	}else if(item.type == "item"){
+		var parent = item.element.parent().parent().parent().parent();
 		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
-		item.element.append(button);
-
-		button = button.find('button')
+		button = button.find('button');
 		button.click(clickme);
+		
+		parent.append(button);
 	}else if(item.type == "filter_item"){
 		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
-		item.element.append(button);
-
-		button = button.find('button')
+		button = button.find('button');
 		button.click(clickme);
+
+		item.element.append(button);
 	}else if(item.type == "filter_item_detail"){
 		var button = $('<div><button class="aui-button js-sync">Pull Request(' + branchNeedPull.length + ')</button></div>');
-		item.element.append(button);
-
-		button = button.find('button')
+		button = button.find('button');
 		button.click(clickme);
+
+		item.element.append(button);
 	}
 }
 
